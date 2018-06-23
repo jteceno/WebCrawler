@@ -20,4 +20,5 @@ public class Link {
 		this.result = result;
 	}
 	
+	
 }

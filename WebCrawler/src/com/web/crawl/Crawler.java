@@ -1,103 +1,94 @@
 package com.web.crawl;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import com.web.data.Link;
 import com.web.data.LoadData;
 import com.web.data.Site;
-
+/**************************************************
+ * 
+ * @author John
+ *	This class is the entry point for the WebCrawler program to handle single json files.
+ .*  
+ **************************************************/
 public class Crawler implements Runnable{
 	String fileName = "";
-	HashMap pages = null;
+	HashMap<String, Site> pages = null;
 	static final String Success = "Success";
-	static final String Error = "Error";
+	static final String Error = "Errors";
 	static final String Skipped = "Skipped";
-	
+	HashSet sortList =new HashSet();
+
 	public Crawler(String fileName) {
 		this.fileName = fileName;
+	}
+	public static void main(String[] args) {
+
+		File f = new File(args[0]);
+
+		  if(!f.exists() || !f.isFile()){
+			  System.out.println("Couldn't open ("+args[0]+")");
+			  return;
+		  }  
+			  
+			  Crawler crawl = new Crawler(args[0]);
+		  
+		crawl.run();
 	}
   @Override
     public void run() {
 		LoadData load = new LoadData();
 		pages = load.loadSites(fileName);
-//		pages = load.loadSites("C:\\Challenges\\WebCrawler\\data\\internet2.json");
+
 		verifySites();
-		showSuccess();
-		showSkipped();
-		showErrors();
+
+		displayResult(Success);
+		displayResult(Skipped);
+		displayResult(Error);
 	}
 
-	private void showErrors() {
+	private void displayResult(String type) {
 		boolean isFirst = true;
-		System.out.println("Errors:\n[");
-		Iterator iter = pages.keySet().iterator();
+		sortList =new HashSet();
+		System.out.println(type+":\n[");
+		Iterator<String> iter = pages.keySet().iterator();
 		while(iter.hasNext()) {
 			String address = (String)iter.next();
 			Site site = (Site)pages.get(address);
-			List links = site.getLinks();
+			List<Link> links = site.getLinks();
+			
 			for(int x=0;x<links.size();x++) {
 				Link link = (Link)links.get(x);
-				if(Error.equals(link.getResult())) {
-					if(!isFirst)
-						System.out.print(",");
-					isFirst = false;
-					System.out.print("\""+link.getLink()+"\"");
-					isFirst = false;
+				if(type.equals(link.getResult())) {
+					sortList.add(link.getLink());
 				}
 			}
 		}
-		System.out.println("]");
-	}
-	private void showSuccess() {
-		boolean isFirst = true;
-		System.out.println("Success:\n[");
-		Iterator iter = pages.keySet().iterator();
-		while(iter.hasNext()) {
-			String address = (String)iter.next();
-			Site site = (Site)pages.get(address);
-			List links = site.getLinks();
-			for(int x=0;x<links.size();x++) {
-				Link link = (Link)links.get(x);
-				if(Success.equals(link.getResult())) {
-					if(!isFirst)
-						System.out.print(",");
-					isFirst = false;
-					System.out.print("\""+link.getLink()+"\"");
-					isFirst = false;
-				}
+		List tempList = new ArrayList(sortList);
+        Collections.sort(tempList);
+        for(int x=0;x<tempList.size();x++) {
+			if(!isFirst)
+					System.out.print(",");
+				isFirst = false;
+				System.out.print("\""+(String)tempList.get(x)+"\"");
+				isFirst = false;
 			}
-		}
+		
 		System.out.println("]");
 	}
-	private void showSkipped() {
-		boolean isFirst = true;
-		System.out.println("Skipped:\n[");
-		Iterator iter = pages.keySet().iterator();
-		while(iter.hasNext()) {
-			String address = (String)iter.next();
-			Site site = (Site)pages.get(address);
-			List links = site.getLinks();
-			for(int x=0;x<links.size();x++) {
-				Link link = (Link)links.get(x);
-				if(Skipped.equals(link.getResult())) {
-					if(!isFirst)
-						System.out.print(",");
-					isFirst = false;
-					System.out.print("\""+link.getLink()+"\"");
-				}
-			}
-		}
-		System.out.println("]");
-	}
+
 	private void verifySites() {
-		Iterator iter = pages.keySet().iterator();
+		Iterator<String> iter = pages.keySet().iterator();
 		while(iter.hasNext()) {
 			String address = (String)iter.next();
 			Site site = (Site)pages.get(address);
 			verifyLinks(site.getLinks());
-//			System.out.println("Address:"+address);
 		}
 
 	}
@@ -118,7 +109,7 @@ public class Crawler implements Runnable{
 		return Error;
 	}
 	private boolean isDuplicate(String link) {
-		Iterator iter = pages.keySet().iterator();
+		Iterator<String> iter = pages.keySet().iterator();
 		while(iter.hasNext()) {
 			String address = (String)iter.next();
 			Site site = (Site)pages.get(address);

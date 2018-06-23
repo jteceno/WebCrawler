@@ -3,7 +3,6 @@ package com.web.data;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -11,7 +10,7 @@ import org.json.simple.parser.JSONParser;
 
 public class LoadData {
 	HashMap<String, Site> rtnMap = new HashMap<String, Site>();
-	   public HashMap loadSites(String file) {
+	   public HashMap<String, Site> loadSites(String file) {
 	        JSONParser parser = new JSONParser();
 	 
 	        try {
@@ -20,7 +19,7 @@ public class LoadData {
 	 
 	            JSONObject jsonObject = (JSONObject) obj;
 	            JSONArray pages = (JSONArray)jsonObject.get("pages");
-	            Iterator i = pages.iterator();
+	            Iterator<JSONObject> i = pages.iterator();
 
 	            while (i.hasNext()) {
 	                JSONObject jObj = (JSONObject) i.next();
@@ -30,7 +29,7 @@ public class LoadData {
 	                site.setAddress(address);
 //	                System.out.println("Address:"+address);
 	                JSONArray links = (JSONArray)jObj.get("links");
-	                Iterator linkIter = links.iterator();
+	                Iterator<String> linkIter = links.iterator();
 	                while(linkIter.hasNext()) {
 	                	Link link = new Link((String) linkIter.next());
 	                	site.addLinks(link);

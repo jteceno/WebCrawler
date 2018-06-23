@@ -5,12 +5,24 @@ import java.io.FilenameFilter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+/**************************************************
+ * 
+ * @author John
+ *	This class is the entry point for the WebCrawler program to handle multiple json files.
+ *  It implements a threaded approach.
+ *  
+ **************************************************/
 public class CrawlThread {
 
     public static void main(String[] args) {
     	CrawlThread cThread = new CrawlThread();
-//    	cThread.processFiles(args[0]);
-    	cThread.processFiles("C:\\Challenges\\WebCrawler\\data");
+    	if(args.length<2) {
+    		System.out.println("Please pass the directory to the json data files");
+    		return;
+    	}
+//    	cThread.processFiles("C:\\Challenges\\WebCrawler\\data");
+    	cThread.processFiles(args[0]);
     }
 	public void processFiles(String path) {
 
