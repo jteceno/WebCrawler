@@ -29,7 +29,10 @@ public class Crawler implements Runnable{
 		this.fileName = fileName;
 	}
 	public static void main(String[] args) {
-
+		if(args.length<2) {
+    		System.out.println("Please pass the path and file name of the the json data file");
+    		return;
+    	}
 		File f = new File(args[0]);
 
 		  if(!f.exists() || !f.isFile()){
